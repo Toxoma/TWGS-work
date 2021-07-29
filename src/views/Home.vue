@@ -218,6 +218,7 @@ export default {
         flex-direction: column;
 
         .add-contact {
+            cursor: pointer;
             align-self: center;
             width: 50%;
             padding: 5px;
