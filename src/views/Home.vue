@@ -5,14 +5,25 @@
             Добавить контакт
         </button>
         <div class="main">
-            <ContactList :delFlag="delFlag" :currentPage="currentPage" v-on:deleteEvent="delFlag=$event.delFlag, selectEl=$event.info" v-on:selectUser="currentPage=$event" />
+            <ContactList 
+            :delFlag="delFlag" 
+            :currentPage="currentPage" 
+            v-on:deleteEvent="delFlag=$event.delFlag, selectEl=$event.info" 
+            v-on:selectUser="currentPage=$event" />
         </div>
     </div>
-    <ContactInfo v-else :addLineFlag="addLineFlag" :delElemFlag="delElemFlag" :changeLineFlag="changeLineFlag" v-on:openPopupAddLine="addLineFlag=$event" :currentPage="currentPage" v-on:back="currentPage=$event" v-on:deleteLine="delElemFlag=$event.delElemFlag, selectLine=$event.info" v-on:changeLine="changeLineFlag=$event.changeLineFlag, selectLine=$event.info, selectLineKey = $event.info[0]" />
+    <ContactInfo v-else 
+    :addLineFlag="addLineFlag" 
+    :delElemFlag="delElemFlag" 
+    :currentPage="currentPage" 
+    :changeLineFlag="changeLineFlag" v-on:openPopupAddLine="addLineFlag=$event" 
+    v-on:back="currentPage=$event" 
+    v-on:deleteLine="delElemFlag=$event.delElemFlag, selectLine=$event.info" 
+    v-on:changeLine="changeLineFlag=$event.changeLineFlag, selectLine=$event.info, selectLineKey = $event.info[0]" />
     <div class="popup-add" v-if="addFlag">
         <form id="form1" @submit.prevent="addContact">
-            <input type="text" v-model="name" placeholder="Имя">
-            <input type="tel" v-model="phone" placeholder="Телефон">
+            <input type="text" v-model="name" placeholder="Имя" required>
+            <input type="tel" v-model="phone" placeholder="Телефон" required>
             <button type="submit">Добавить</button>
         </form>
     </div>
@@ -36,15 +47,15 @@
     </div>
     <div class="popup-add-line" v-if="addLineFlag">
         <form id="form2" @submit.prevent="addLine">
-            <input type="text" v-model="nameLine" placeholder="Название">
-            <input type="text" v-model="valueLine" placeholder="Значение">
+            <input type="text" v-model="nameLine" placeholder="Название" required>
+            <input type="text" v-model="valueLine" placeholder="Значение" required>
             <button type="submit">Добавить</button>
         </form>
     </div>
     <div class="popup-change-line" v-if="changeLineFlag">
         <form id="form3" @submit.prevent="changeLine">
-            <input type="text" v-model="selectLine[0]" placeholder="Название">
-            <input type="text" v-model="selectLine[1]" placeholder="Значение">
+            <input type="text" v-model="selectLine[0]" placeholder="Название" required>
+            <input type="text" v-model="selectLine[1]" placeholder="Значение" required>
             <button type="submit">Сохранить</button>
         </form>
     </div>
@@ -67,19 +78,24 @@ export default {
     },
     data() {
         return {
+            //здесь флаги "текущей" страницы и popup(ов)
             currentPage: false,
             addFlag: false,
             delFlag: false,
             delElemFlag: false,
             addLineFlag: false,
             changeLineFlag: false,
+            //поля форм
             name: '',
             phone: '',
             nameLine: '',
             valueLine: '',
-            selectLineKey: '',
+            //данные при контакта при удалении
             selectEl: {},
+            //выбранная строка данных (в выбранном контакте)
             selectLine: {},
+            //ключ выбранной строки
+            selectLineKey: '',
         };
     },
     computed: {
@@ -87,13 +103,20 @@ export default {
     },
     methods: {
         ...mapActions({
+            //отправка запроса на получение всех контактов
             getContacts: "getContacts",
+            //добавить новый контакт
             addNewContact: "addNewContact",
+            //добавить строку информации
             addNewLine: "addNewLine",
+            //удалить контакт
             deleteContact: "deleteContact",
+            //удалить строку инфомации
             deleteLine: "deleteLine",
+            //изменить строку информации
             changeUserLine: "changeUserLine",
         }),
+        //закрытие popup при клике мимо окна
         checkClick: function (e) {
             if (e.target.closest('.popup-add') && !e.target.closest('#form1')) {
                 this.closeAddPopup();
@@ -111,7 +134,7 @@ export default {
                 this.closeElemConfirmPopup();
             }
         },
-
+        //непосредственно методы закрытия и очистки popup(ов)
         closeAddPopup: function () {
             this.addFlag = false;
             this.name = '';
@@ -131,16 +154,17 @@ export default {
         closeChangeLinePopup: function () {
             this.changeLineFlag = false;
         },
-
+        //метод удаления контакта
         deletElem: function () {
             this.deleteContact(this.selectEl);
             this.closeConfirmPopup();
         },
+        //метод удаления строки данных
         delLine: function () {
             this.deleteLine(this.selectLine);
             this.closeElemConfirmPopup();
         },
-
+        //метод добавления контакта
         addContact: function () {
             this.addNewContact({
                 name: this.name,
@@ -148,6 +172,7 @@ export default {
             });
             this.closeAddPopup();
         },
+        //метод добавления строки данных
         addLine: function () {
             this.addNewLine({
                 name: this.nameLine,
@@ -155,13 +180,16 @@ export default {
             });
             this.closeAddLinePopup();
         },
+        //метод изменения строки данных
         changeLine: function () {
             this.changeUserLine([this.selectLineKey, this.selectLine]);
             this.closeChangeLinePopup();
         },
     },
     mounted() {
+        //обработкик события закрытия popup(ов)
         document.addEventListener('click', this.checkClick);
+        //получение всех контактов
         this.getContacts();
     },
 }
@@ -199,6 +227,7 @@ export default {
 
         &>.main {
             // Для примера высота в 400px чтобы было видно прокрутку.
+            // (мог реализовать и через пагинацию)
             // height: 100%;
             height: 400px;
             overflow-y: auto;

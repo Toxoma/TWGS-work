@@ -2,10 +2,15 @@
 <div class="contact-info">
     <div class="header">
         <img @click="$emit('back',!currentPage)" class="foto-back" src="../assets/back.svg" alt="back">
-        <button @click="returnEvent" :disabled="previousVersion.length<=1">Отмена изменения</button>
+        <button class="reset-btn" @click="returnEvent" :disabled="previousVersion.length<=1">Отмена изменения</button>
     </div>
     <main>
-        <GenerateUserLines v-for="line in array" :key="line" :info="line" :delElemFlag="delElemFlag" :changeLineFlag="changeLineFlag" v-on:deleteLine="$emit('deleteLine',$event)" v-on:changeLine="$emit('changeLine',$event)" />
+        <GenerateUserLines v-for="line in array" :key="line" 
+        :info="line" 
+        :delElemFlag="delElemFlag" 
+        :changeLineFlag="changeLineFlag" 
+        v-on:deleteLine="$emit('deleteLine',$event)" 
+        v-on:changeLine="$emit('changeLine',$event)" />
     </main>
     <button class="add-line" @click="$emit('openPopupAddLine', !addLineFlag)">
         Добавить поле
@@ -25,6 +30,7 @@ export default {
     name: 'ContatcInfo',
     data() {
         return {
+            //здесь массив с записями предыдущих версий изменений
             previousVersion: [],
         };
     },
@@ -39,18 +45,24 @@ export default {
     },
     computed: {
         ...mapState({
+            //данные выбранного контакта
             info: (state) => state.selectedContact,
         }),
+        //отсортированный массив с данными выбранного контакта
         array: function () {
+            //вызов метода сохранения текущей версии изменения
             this.saveInfo(this.info);
+            // результат метода сортировки в который мы передали объект пересобранный в массив
             return this.sortMas(Object.entries(this.info));
         },
 
     },
     methods: {
         ...mapActions({
+            //перезапись выбранных данных на шаг назад
             returnBehind: "returnBehind",
         }),
+        //метод сортировки массива
         sortMas: function (mas) {
             mas.sort((prev, next) => {
                 if (prev[0] < next[0]) return -1;
@@ -58,19 +70,21 @@ export default {
             });
             return mas;
         },
-
+        //метод сохранения текущей версии изменения
         saveInfo: function (arr) {
             this.previousVersion.push({
                 ...arr
             });
         },
-
+        //метод отката версии изменения
         returnEvent: function () {
+            //ключ предыдущей версии иззменения
             const key = this.previousVersion.length - 2;
 
             if (key >= 0) {
                 this.returnBehind(this.previousVersion[key]);
-
+                //очистка массива previousVersion от более новых изменений
+                //кнопка "отката" при размере previousVersion < 2 не работает
                 setTimeout(() => {
                     this.previousVersion.splice(key + 1);
                 }, 100);
@@ -94,6 +108,12 @@ export default {
         display: flex;
         justify-content: space-between;
         margin-bottom: 1rem;
+        .reset-btn{
+             cursor: pointer;
+        }
+        .reset-btn:disabled{
+            cursor: default;
+        }
     }
 
     .foto-back {

@@ -1,6 +1,12 @@
 <template>
 <div class="">
-    <ContactBlock v-for="contact in array" :key="contact.id" :info="contact" :delFlag="delFlag" :currentPage="currentPage" v-on:deleteEvent="$emit('deleteEvent', $event)" v-on:selectUser="$emit('selectUser', $event)" />
+    <ContactBlock 
+    v-for="contact in array" :key="contact.id" 
+    :info="contact" 
+    :delFlag="delFlag" 
+    :currentPage="currentPage" 
+    v-on:deleteEvent="$emit('deleteEvent', $event)" 
+    v-on:selectUser="$emit('selectUser', $event)" />
 </div>
 </template>
 
@@ -14,7 +20,6 @@ export default {
     name: 'ContactList',
     data() {
         return {
-            sortArray: [],
         };
     },
     props: {
@@ -26,15 +31,17 @@ export default {
     },
     computed: {
         ...mapState({
+            //массив с нашими контактами
             contacts: (state) => state.contacts,
         }),
-
+        //отсортированный массив по алфавиту
         array: function () {
             return this.sortMas(this.contacts);
         },
 
     },
     methods: {
+        //метод сортировки массива по алфавиту
         sortMas: function (mas) {
             mas.sort((prev, next) => {
                 if (prev.name < next.name) return -1;

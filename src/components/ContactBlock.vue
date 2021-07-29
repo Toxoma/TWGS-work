@@ -41,8 +41,10 @@ export default {
     },
     methods: {
         ...mapActions({
+            //запоминаем данные выбранного контакта
             selectContact: "selectContact",
         }),
+        //метод "переключения страницы" и записи данных при выборе контакта
         putInStorage: function () {
             this.$emit('selectUser', !this.currentPage);
             this.selectContact(this.info);
